@@ -14,3 +14,17 @@ def dsm_loss(model, x, sigmas):
     target= -noise/sigma
 
     return (((score-target)**2)*(sigma**2)).mean()
+
+def dsm_loss_toy(model, x, sigmas):
+
+    noise = torch.randn_like(x)
+    x_noisy = x + sigmas.view(-1,1)*noise
+
+    score = model(x_noisy, sigmas)
+    target = -noise/sigmas.view(-1,1)
+
+    loss = 0.5 * ((score-target)**2).sum(dim=1) * (sigmas**2).squeeze()
+    return loss.mean()
+
+
+
