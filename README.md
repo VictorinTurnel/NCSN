@@ -3,7 +3,7 @@
 ## Description
 This repository contains a PyTorch implementation of the concepts introduced in the paper **"Generative Modeling by Estimating Gradients of the Data Distribution"** (Song & Ermon, NeurIPS 2019).
 
-The goal of this project is to explore a new principle for generative modeling based on estimating and sampling from the Stein score ($ \nabla_x \log p_{data}(x) $) of the data distribution.
+The goal of this project is to explore a new principle for generative modeling based on estimating and sampling from the Stein score of the data distribution.
 
 This implementation focuses on three key aspects:
 1.  **Score Estimation:** Learning the vector field of gradients using a simple MLP.
