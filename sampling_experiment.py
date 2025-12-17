@@ -63,11 +63,11 @@ if __name__ == "__main__":
     SIGMA_MAX = 2.0
     SIGMA_MIN = 0.01
     NUM_LEVEL = 10
-    N_SAMPLES = 1
+    N_SAMPLES = 6
 
     sigmas_np = np.exp(np.linspace(np.log(SIGMA_MAX), np.log(SIGMA_MIN), NUM_LEVEL))
     SIGMAS = torch.tensor(sigmas_np, dtype=torch.float32, device=DEVICE)
-    MODEL_PATH = "resultsback/model_epoch_50.pth"
+    MODEL_PATH = "results/MNIST/model_epoch_50.pth"
     SAVE_DIR = "results/sampling_grid/"
 
 
