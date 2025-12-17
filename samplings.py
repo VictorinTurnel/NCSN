@@ -1,5 +1,6 @@
 import torch
 
+# Functions for sampling from the trained score-based model
 @torch.no_grad()
 def annealed_sampling(model, n_samples, sigmas, T = 100, epsilon = 1e-5, device="cuda"):
     model.eval()
@@ -7,13 +8,18 @@ def annealed_sampling(model, n_samples, sigmas, T = 100, epsilon = 1e-5, device=
 
     samples = []
     for i, sigma in enumerate(sigmas):
+        # We compute the step size for the current noise level
         alpha = epsilon*(sigma/sigmas[-1])**2
 
         for t in range(T):
+            # We generate Gaussian noise
             z = torch.randn_like(x)
+
+            # We compute the model's predicted score and update the samples
             score_model = model(x, sigma.repeat(n_samples)) / sigma
             x = x + 0.5*alpha*score_model
 
+            # We avoid adding noise on the last step
             last_step = (i==len(sigmas)-1) and (t==T-1)
             if not last_step:
                 x=x+torch.sqrt(alpha)* z
@@ -22,8 +28,10 @@ def annealed_sampling(model, n_samples, sigmas, T = 100, epsilon = 1e-5, device=
         x=x.clamp(-1.2, 1.2)
         samples.append(x.clone())
 
-    return samples
+    return samples, x
 
+
+# Similar sampling functions adapted for 2D synthetic data
 @torch.no_grad()
 def annealed_langevin_toy(model, n_samples, sigmas, T = 100, epsilon = 2e-5, device="cuda"):
     model.eval()
@@ -43,12 +51,17 @@ def annealed_langevin_toy(model, n_samples, sigmas, T = 100, epsilon = 2e-5, dev
 
     return x
 
+# Similar sampling functions adapted for 2D synthetic data
+# This function implements standard Langevin dynamics for comparison purposes
+# It doesn't iterate over multiple noise levels like annealed Langevin dynamics
 @torch.no_grad()
 def standard_langevin_toy(model, n_samples, sigmas, T = 100, epsilon = 1e-5, device="cuda"):
     model.eval()
     x = torch.rand(n_samples,2, device = device) * 16 - 8
 
     sigma = sigmas[-1]
+    # Iteration over T steps of Langevin dynamics
+    # No iteration over multiple noise levels
     for t in range(T):
         z = torch.randn_like(x)
         score_model = model(x, sigma.repeat(n_samples))

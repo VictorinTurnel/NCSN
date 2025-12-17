@@ -3,6 +3,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+# It transforms the scalar sigma into a higher-dimensional embedding
+# This embedding is then used throughout the network to adapt to different noise levels
 class SigmaCond(nn.Module):
     
     def __init__(self, dim = 32):
@@ -16,6 +18,8 @@ class SigmaCond(nn.Module):
     def forward(self,sigma):
         return self.net(sigma[:,None])
     
+# 2D convolutional block with conditioning on sigma embedding
+# Used in the MNIST_NCSN model to process image data while incorporating noise level information
 class ConvBlock(nn.Module):
 
     def __init__(self, input_dim, output_dim, emd_dim):
@@ -30,15 +34,22 @@ class ConvBlock(nn.Module):
         h = h + self.emb(emb)[:,:,None,None]
         return F.silu(h)
     
-
+# Neural network model for score estimation on MNIST dataset
+# It uses convolutional layers and conditions on noise levels via sigma embeddings
 class MNIST_NCSN(nn.Module):
     def __init__(self, embd_dim=32):
         super().__init__()
+        # Embedding layer for sigma conditioning
+        # Encoding layers
         self.emb = SigmaCond(embd_dim)
         self.enc1 = ConvBlock(1,32,embd_dim)
         self.enc2 = ConvBlock(32,64,embd_dim)
         self.enc3 = ConvBlock(64,128,embd_dim)
+
+        # Downsampling layer
         self.pool = nn.AvgPool2d(2)
+
+        # Upsampling and decoding layers
         self.dec3 = ConvBlock(128,64,embd_dim)
         self.dec2 = ConvBlock(64,32,embd_dim)
         self.out = nn.Conv2d(32,1,3,padding = 1)
@@ -55,7 +66,8 @@ class MNIST_NCSN(nn.Module):
         
         return self.out(d1)
     
-
+# Simple feedforward neural network for score estimation on 2D synthetic data
+# It concatenates the 2D input with the log of the noise level sigma
 class Toy_NCSN(nn.Module):
 
     def __init__(self, emb_dim = 128):

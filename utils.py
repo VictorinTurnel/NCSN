@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 
+# This function generates samples from a Gaussian mixture model
+# Used for visualizing and testing score-based models on synthetic data.
 def sample_generator_gaussian(n_samples, weights, means, device="cuda"):
 
     indices = np.random.choice(len(weights),size=n_samples,p=weights)
@@ -14,6 +16,8 @@ def sample_generator_gaussian(n_samples, weights, means, device="cuda"):
 
     return torch.stack(samples).to(device)
 
+# This function generates samples from a circle distribution
+# Used for visualizing and testing score-based models on synthetic data.
 def sample_generator_circle(n_samples, data_sigma, radius, device="cuda"):
     theta = torch.randn(n_samples)*2*np.pi
     r = torch.randn(n_samples) * data_sigma + radius
@@ -21,7 +25,8 @@ def sample_generator_circle(n_samples, data_sigma, radius, device="cuda"):
     y = r * torch.sin(theta)
     return torch.stack([x,y],dim=1).to(device)
 
-
+# This function computes the ground truth score for the circle distribution
+# Used to evaluate the accuracy of the learned score function.
 def get_ground_circle(x, data_sigma, radius, sigma_noise):
 
     norm = torch.norm(x, dim=1, keepdim=True)

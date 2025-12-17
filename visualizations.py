@@ -5,6 +5,7 @@ import torch
 from torchvision.utils import make_grid
 
 
+# Function to save visualization of generated samples during training
 def save_visualization(samples, epoch, save_dir):
     fig, axes = plt.subplots(1, len(samples), figsize=(20,4))
     fig.suptitle(f"Epoch {epoch}", fontsize=16)
@@ -21,6 +22,8 @@ def save_visualization(samples, epoch, save_dir):
     plt.savefig(save_path)
     plt.close()
 
+# Visualization functions for 2D synthetic data (the circle distribution)
+# Used to visualize the learned score function, the ground truth, and the error map.
 def visualization_grid_circle(model, samples, sigmas, data_sigma, radius, get_ground_truth, device):
 
     range_lim = 10
@@ -33,10 +36,12 @@ def visualization_grid_circle(model, samples, sigmas, data_sigma, radius, get_gr
     last_sigma = sigmas[-1].item()
     sigma_tensor = torch.ones(grid.shape[0], device=device)*last_sigma
 
+    # Here we get the model's predicted score
     model.eval()
     with torch.no_grad():
         score = model(grid, sigma_tensor.unsqueeze(1)).cpu()
 
+    # We compute the ground truth score and the error norm
     score_gt = get_ground_truth(grid.cpu(), data_sigma, radius, last_sigma)
     error = score - score_gt
     error_norm = torch.norm(error, dim=1).reshape(X.shape)
@@ -74,6 +79,8 @@ def visualization_grid_circle(model, samples, sigmas, data_sigma, radius, get_gr
     plt.tight_layout()
     plt.show()
 
+# Visualization functions for 2D synthetic data (the Gaussian mixture distribution)
+# Used to compare sampling methods: standard Langevin dynamics vs annealed Langevin dynamics.
 def visualization_grid_gaussian(samples_gt, samples_standard, sample_annealed):
 
     range_lim = 10
