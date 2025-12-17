@@ -42,3 +42,24 @@ To train the model and generate samples:
 ```
 python ./training_MNIST.py
 ```
+
+### Improved MNIST Generation with EMA
+
+To improve the visual quality and consistency of the generated digits, this experiment implements **Exponential Moving Average (EMA)** on the model weights during training.
+
+EMA helps stabilize the training process by smoothing out fluctuations in the weights, often leading to samples that are less noisy and structurally more coherent than those from the standard training loop.
+
+To train the model and generate samples:
+
+```
+python ./training_MNIST_EMA.py
+```
+
+### Sampling Hyperparameter Grid Search
+
+The quality of samples generated via Langevin Dynamics is highly sensitive to the sampling parameters, specifically the step size and the number of steps.
+
+This script performs a **grid search** over these hyperparameters to analyze their impact on the generation process. 
+```
+python ./sampling_experiment.py
+```
